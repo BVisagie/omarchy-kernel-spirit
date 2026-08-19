@@ -12,7 +12,7 @@ This is unofficial fan work. Not affiliated with or endorsed by Linus Torvalds, 
   <img src="assets/rice-more-than-compile.png" alt="Kernel Spirit: You rice more than you compile. Respect." width="320">
   <img src="assets/dotfiles-are-showing.png" alt="Kernel Spirit: Your dotfiles are showing. Good. Own them." width="320">
   <br>
-  <img src="assets/warnings-are-errors.png" alt="Kernel Spirit: Warnings are errors that haven't grown up yet." width="320">
+  <img src="assets/it-worked-on-your-machine.png" alt="Kernel Spirit: It worked on your machine? This is your machine." width="320">
   <img src="assets/theme-change-light.png" alt="Kernel Spirit on a light theme: A theme change. Bold move for someone with uncommitted work." width="320">
 </p>
 
