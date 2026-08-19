@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.bvisagie.kernel-spirit",
+  "name": "Kernel Spirit",
+  "version": "1.0.0",
+  "author": "BVisagie",
+  "license": "MIT",
+  "description": "A grouchy kernel-hacker penguin that lives in the bar and comments, in character, on what the machine is doing.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "KernelSpirit.qml"
+  },
+  "barWidget": {
+    "displayName": "Kernel Spirit",
+    "description": "Summons a speech bubble with blunt, useful-feeling advice. Wanders in occasionally; mute him from the bar.",
+    "category": "Companion",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "muted": false,
+      "wanderIntervalMin": 60,
+      "cooldownMin": 45,
+      "autoHideMs": 8000,
+      "snoozeMin": 60,
+      "loadTrigger": true,
+      "batteryTrigger": true,
+      "lateNightTrigger": true,
+      "uptimeTrigger": true,
+      "themeTrigger": true,
+      "loadThreshold": 0.75,
+      "batteryThreshold": 20,
+      "lateNightStartHour": 0,
+      "lateNightEndHour": 5
+    },
+    "schema": [
+      { "key": "muted", "type": "boolean", "label": "Mute wander and reactions", "defaultValue": false },
+      { "key": "wanderIntervalMin", "type": "integer", "label": "Wander interval (minutes)", "min": 15, "max": 240, "step": 15, "defaultValue": 60 },
+      { "key": "cooldownMin", "type": "integer", "label": "Reaction cooldown (minutes)", "min": 10, "max": 180, "step": 5, "defaultValue": 45 },
+      { "key": "autoHideMs", "type": "integer", "label": "Auto-hide (ms)", "min": 3000, "max": 20000, "step": 1000, "defaultValue": 8000 },
+      { "key": "snoozeMin", "type": "integer", "label": "Snooze length (minutes)", "min": 15, "max": 240, "step": 15, "defaultValue": 60 },
+      { "key": "loadTrigger", "type": "boolean", "label": "Comment on high load", "defaultValue": true },
+      { "key": "batteryTrigger", "type": "boolean", "label": "Comment on low battery", "defaultValue": true },
+      { "key": "lateNightTrigger", "type": "boolean", "label": "Comment on late-night sessions", "defaultValue": true },
+      { "key": "uptimeTrigger", "type": "boolean", "label": "Comment on long uptime", "defaultValue": true },
+      { "key": "themeTrigger", "type": "boolean", "label": "Comment on theme changes", "defaultValue": true },
+      { "key": "loadThreshold", "type": "number", "label": "Load per core that counts as busy", "defaultValue": 0.75 },
+      { "key": "batteryThreshold", "type": "integer", "label": "Battery % that counts as low", "min": 5, "max": 40, "step": 5, "defaultValue": 20 },
+      { "key": "lateNightStartHour", "type": "integer", "label": "Late-night start hour (0–23)", "min": 0, "max": 23, "defaultValue": 0 },
+      { "key": "lateNightEndHour", "type": "integer", "label": "Late-night end hour (0–23)", "min": 0, "max": 23, "defaultValue": 5 }
+    ]
+  }
+}
