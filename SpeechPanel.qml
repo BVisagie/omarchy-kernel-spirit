@@ -24,6 +24,8 @@ Panel {
 
   readonly property color contentForeground: bar ? bar.foreground : Color.foreground
   readonly property string contentFontFamily: bar ? bar.fontFamily : Style.font.family
+  readonly property int penguinSize: Style.space(64)
+  readonly property int bubbleWidth: Style.space(400)
   readonly property int autoHideMs: hostWidget
     ? Math.max(3000, Number(hostWidget.setting("autoHideMs", 8000)))
     : 8000
@@ -97,7 +99,7 @@ Panel {
     bar: root.bar
     open: root.opened
     focusTarget: keyCatcher
-    contentWidth: panel.fittedContentWidth(Style.space(320))
+    contentWidth: panel.fittedContentWidth(root.bubbleWidth)
     contentHeight: panel.fittedContentHeight(bubble.implicitHeight)
 
     PanelKeyCatcher {
@@ -117,12 +119,12 @@ Panel {
       Row {
         id: bubble
         width: parent.width
-        spacing: Style.space(12)
+        spacing: Style.space(16)
 
         Loader {
           id: panelPenguin
-          width: Style.space(48)
-          height: Style.space(48)
+          width: root.penguinSize
+          height: root.penguinSize
           source: Qt.resolvedUrl("PenguinIcon.qml")
         }
 
@@ -141,16 +143,17 @@ Panel {
         }
 
         Column {
-          width: parent.width - Style.space(48) - Style.space(12)
-          spacing: Style.space(6)
+          width: parent.width - root.penguinSize - Style.space(16)
+          spacing: Style.space(8)
 
           Text {
             width: parent.width
             text: root.quoted ? "“" + root.lineText + "”" : (root.lineText || "…")
             color: root.contentForeground
             font.family: root.contentFontFamily
-            font.pixelSize: Style.font.subtitle
+            font.pixelSize: Style.font.title
             wrapMode: Text.WordWrap
+            lineHeight: 1.2
           }
 
           Text {
