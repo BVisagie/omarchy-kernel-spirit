@@ -26,7 +26,10 @@ BarWidget {
   property bool uptimePrimed: false
   property bool batteryLowLatched: false
   property string lastNightKey: ""
+  property string lastSpecialDayKey: ""
   property double lastReactionAt: 0
+  property double lastPollAt: 0
+  property bool resumePrimed: false
 
   readonly property bool muted: Lines.isTruthy(setting("muted", false))
   readonly property bool snoozed: snoozeUntil > 0
@@ -42,6 +45,8 @@ BarWidget {
   readonly property bool lateNightTrigger: Lines.isTruthy(setting("lateNightTrigger", true))
   readonly property bool uptimeTrigger: Lines.isTruthy(setting("uptimeTrigger", true))
   readonly property bool themeTrigger: Lines.isTruthy(setting("themeTrigger", true))
+  readonly property bool resumeTrigger: Lines.isTruthy(setting("resumeTrigger", true))
+  readonly property bool specialDayTrigger: Lines.isTruthy(setting("specialDayTrigger", true))
 
   // Theme reactions stay quiet during startup while the theme first loads.
   property bool themeArmed: false
@@ -53,10 +58,12 @@ BarWidget {
 
   // Built fresh per line so the wall clock is never stale.
   function makeContext() {
+    var days = Lines.uptimeDays(uptimeSeconds)
     return {
       load: loadOne >= 0 ? loadOne.toFixed(2) : "?",
       battery: batteryPercent >= 0 ? batteryPercent : "?",
-      days: Lines.uptimeDays(uptimeSeconds),
+      days: days,
+      dayUnit: Lines.dayUnit(days),
       hour: Lines.formatHour(new Date())
     }
   }
@@ -102,7 +109,7 @@ BarWidget {
     var line = Lines.speak(kind, root.recentLines, makeContext())
     if (!line) return false
     root.currentLine = line
-    var recent = root.recentLines.slice(-2)
+    var recent = root.recentLines.slice(-4)
     recent.push(line.raw)
     root.recentLines = recent
     root.lineEpoch = root.lineEpoch + 1
@@ -145,7 +152,21 @@ BarWidget {
   }
 
   function checkSignals() {
-    var now = new Date()
+    var nowMs = Date.now()
+    var now = new Date(nowMs)
+
+    if (root.snoozeUntil > 0 && nowMs >= root.snoozeUntil) {
+      snoozeTimer.stop()
+      root.snoozeUntil = 0
+    }
+
+    if (root.resumeTrigger) {
+      if (root.resumePrimed && root.lastPollAt > 0 && nowMs - root.lastPollAt > Lines.resumeGapMs())
+        maybeSpeak("resume", true)
+      root.resumePrimed = true
+    }
+    root.lastPollAt = nowMs
+
     var perCore = root.coreCount > 0 && root.loadOne >= 0 ? root.loadOne / root.coreCount : -1
 
     if (root.loadTrigger && perCore >= 0) {
@@ -165,6 +186,8 @@ BarWidget {
       if (low && !root.batteryLowLatched) {
         if (maybeSpeak("battery")) root.batteryLowLatched = true
       } else if (!low) {
+        if (root.batteryLowLatched && present && !UPower.onBattery)
+          maybeSpeak("powerRestored")
         root.batteryLowLatched = false
       }
     }
@@ -184,6 +207,15 @@ BarWidget {
         var milestone = Lines.nextMilestone(days, root.lastUptimeMilestone)
         if (milestone > 0 && maybeSpeak("uptime"))
           root.lastUptimeMilestone = milestone
+      }
+    }
+
+    if (root.specialDayTrigger) {
+      var specialKind = Lines.specialDayKind(now)
+      if (specialKind) {
+        var specialKey = Lines.dayKey(now)
+        if (specialKey !== root.lastSpecialDayKey && maybeSpeak(specialKind))
+          root.lastSpecialDayKey = specialKey
       }
     }
   }

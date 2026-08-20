@@ -68,8 +68,17 @@ Panel {
   // Beak flaps for a moment whenever a fresh line appears.
   property bool talking: false
 
+  function talkDurationMs() {
+    var n = root.lineText ? root.lineText.length : 0
+    var ms = n * 55
+    if (ms < 1200) return 1200
+    if (ms > 6000) return 6000
+    return ms
+  }
+
   function startTalking() {
     root.talking = true
+    talkTimer.interval = talkDurationMs()
     talkTimer.restart()
   }
 

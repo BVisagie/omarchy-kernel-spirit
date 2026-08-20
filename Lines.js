@@ -2,7 +2,9 @@
 // Fabricated lines belong to the penguin. Quoted entries are real public
 // remarks, marked in the UI and sourced in the README.
 
-var UPTIME_MILESTONES = [1, 7, 14, 30]
+var UPTIME_MILESTONES = [1, 7, 14, 30, 60, 90, 100]
+var RESUME_GAP_MS = 120000
+var FRIDAY_DEPLOY_HOUR = 16
 
 var WANDER = [
   { text: "If it compiles, ship it. If it doesn't, that's also information." },
@@ -27,6 +29,15 @@ var WANDER = [
   { text: "Naming things is hard. That's why you have a folder called tmp." },
   { text: "Your dotfiles are showing. Good. Own them." },
   { text: "Somewhere a process is leaking memory. It can wait. Probably." },
+  { text: "grep is a lifestyle. Accept this." },
+  { text: "If you have to comment it, you should have named it." },
+  { text: "Permissions are not a suggestion. Neither am I." },
+  { text: "Your PATH is a cry for help." },
+  { text: "systemd is not the kernel. I will not be taking questions." },
+  { text: "You can rice the bar. You cannot rice entropy." },
+  { text: "strace first. Then form an opinion." },
+  { text: "The man page exists. You just don't like it." },
+  { text: "Uncommitted work is Schrödinger's feature." },
   { text: "Talk is cheap. Show me the code.", quoted: true, source: "Linus Torvalds, linux-kernel mailing list, 25 Aug 2000" },
   { text: "Only wimps use tape backup: real men just upload their important stuff on ftp, and let the rest of the world mirror it ;)", quoted: true, source: "Linus Torvalds, linux-kernel mailing list, 20 Jul 1996" },
   { text: "Given enough eyeballs, all bugs are shallow.", quoted: true, source: "“Linus's Law”, coined by Eric S. Raymond in The Cathedral and the Bazaar" }
@@ -42,7 +53,11 @@ var CLICK = [
   { text: "If this is about systemd, I already know." },
   { text: "Speak. I bill by the jiffy." },
   { text: "This had better be about something segfaulting." },
-  { text: "One line. That's the format." }
+  { text: "One line. That's the format." },
+  { text: "Still here. Still judging." },
+  { text: "Clicking me will not make the compile faster." },
+  { text: "What now." },
+  { text: "I heard you. Unfortunately." }
 ]
 
 var LOAD = [
@@ -52,7 +67,10 @@ var LOAD = [
   { text: "If this is a compile, good. If this is JavaScript, we need to talk." },
   { text: "Scheduler's doing its job. Whatever you started had better be worth it." },
   { text: "{load} load average. The fans believe in you. I remain neutral." },
-  { text: "All cores accounted for and screaming. Carry on." }
+  { text: "All cores accounted for and screaming. Carry on." },
+  { text: "Load {load}. Something wants all of you. I hope you consented." },
+  { text: "The run queue is not empty. Neither is my list of complaints." },
+  { text: "Pegged. If this is rustc, I allow it." }
 ]
 
 var BATTERY = [
@@ -61,7 +79,9 @@ var BATTERY = [
   { text: "You're discharging like it's a feature. It isn't." },
   { text: "{battery}% and falling. Sync, save, then panic if you must." },
   { text: "The kernel can power-manage. It cannot generate power. {battery}%." },
-  { text: "Electrons are a finite resource today. {battery}%." }
+  { text: "Electrons are a finite resource today. {battery}%." },
+  { text: "{battery}%. Charming. The wall has a socket. Use it." },
+  { text: "Low battery is a planning failure. {battery}%." }
 ]
 
 var LATE_NIGHT = [
@@ -71,15 +91,19 @@ var LATE_NIGHT = [
   { text: "Go to bed. The machine will still be wrong in the morning." },
   { text: "{hour}. Caffeine is not a scheduler." },
   { text: "Past midnight the only thing you should ship is yourself, to bed." },
-  { text: "It's {hour}. Whatever you're debugging, it's winning." }
+  { text: "It's {hour}. Whatever you're debugging, it's winning." },
+  { text: "{hour}. Sleep is not optional, even if the kernel makes it look that way." },
+  { text: "Debugging at {hour} is how you invent new classes of bug." }
 ]
 
 var UPTIME = [
-  { text: "{days} days without a reboot. Either you're careful or lucky. Don't ask which." },
-  { text: "Uptime: {days} days. The kernel is not impressed. I am slightly less annoyed." },
-  { text: "Still up after {days} days. Don't jinx it." },
-  { text: "{days} days. Fine. You may feel a little smug. Quietly." },
-  { text: "{days} days of uptime and nothing on fire. Statistically suspicious." }
+  { text: "{days} {dayUnit} without a reboot. Either you're careful or lucky. Don't ask which." },
+  { text: "Uptime: {days} {dayUnit}. The kernel is not impressed. I am slightly less annoyed." },
+  { text: "Still up after {days} {dayUnit}. Don't jinx it." },
+  { text: "{days} {dayUnit}. Fine. You may feel a little smug. Quietly." },
+  { text: "{days} {dayUnit} of uptime and nothing on fire. Statistically suspicious." },
+  { text: "{days} {dayUnit} up. Patch Tuesday is coming. I can feel it." },
+  { text: "No reboot in {days} {dayUnit}. Either discipline or denial." }
 ]
 
 var THEME = [
@@ -88,7 +112,42 @@ var THEME = [
   { text: "I liked the old colors. I'll adapt. I always adapt." },
   { text: "Fresh palette. The kernel doesn't care. I almost do." },
   { text: "You rice more than you compile. Respect." },
-  { text: "Noted. I match the furniture now." }
+  { text: "Noted. I match the furniture now." },
+  { text: "Colors changed. Personality did not." },
+  { text: "Another theme. The pixels are the same shape. I checked." }
+]
+
+var RESUME = [
+  { text: "You suspended me. I remembered everything." },
+  { text: "Welcome back. The RAM forgot. I didn't." },
+  { text: "Resume from RAM. Cute. Don't make a habit of it." },
+  { text: "I was not sleeping. I was waiting." },
+  { text: "The clock jumped. I noticed." }
+]
+
+var POWER_RESTORED = [
+  { text: "Power restored. Try not to do that again." },
+  { text: "AC is back. The electrons forgive you. I am considering it." },
+  { text: "Plugged in. The crisis you almost had can wait." },
+  { text: "Good. Batteries are not a personality." }
+]
+
+var LINUX_ANNIVERSARY = [
+  { text: "This day in 1991: 'just a hobby.' Look at you now." },
+  { text: "August 25. A mailing-list post ate the world. Don't get ideas." },
+  { text: "Anniversary of a hobby project. The rest was persistence." }
+]
+
+var LINUX_RELEASE = [
+  { text: "October 5. Someone shipped 0.02. You still haven't tagged yours." },
+  { text: "First public kernel drop, this day. The diffs were smaller then." },
+  { text: "0.02 shipped on a day like this. No CI. No mercy. It worked." }
+]
+
+var FRIDAY_DEPLOY = [
+  { text: "It's Friday after 16:00. Deploy nothing. I am not asking." },
+  { text: "Friday evening. The only merge I condone is you, with a chair." },
+  { text: "Ship on Friday and I will remember. The kernel never forgets." }
 ]
 
 function bankFor(kind) {
@@ -97,6 +156,11 @@ function bankFor(kind) {
   if (kind === "lateNight") return LATE_NIGHT
   if (kind === "uptime") return UPTIME
   if (kind === "themeChange") return THEME
+  if (kind === "resume") return RESUME
+  if (kind === "powerRestored") return POWER_RESTORED
+  if (kind === "linuxAnnouncement") return LINUX_ANNIVERSARY
+  if (kind === "linuxRelease") return LINUX_RELEASE
+  if (kind === "fridayDeploy") return FRIDAY_DEPLOY
   if (kind === "click") return CLICK.concat(WANDER)
   return WANDER
 }
@@ -124,6 +188,14 @@ function formatHour(date) {
   return pad2(date.getHours()) + ":" + pad2(date.getMinutes())
 }
 
+function dayKey(date) {
+  return date.getFullYear() + "-" + pad2(date.getMonth() + 1) + "-" + pad2(date.getDate())
+}
+
+function dayUnit(days) {
+  return Number(days) === 1 ? "day" : "days"
+}
+
 function render(entry, ctx) {
   if (!entry) return null
   var text = String(entry.text || "")
@@ -131,6 +203,7 @@ function render(entry, ctx) {
     if (ctx.load !== undefined) text = text.replace(/\{load\}/g, String(ctx.load))
     if (ctx.battery !== undefined) text = text.replace(/\{battery\}/g, String(ctx.battery))
     if (ctx.days !== undefined) text = text.replace(/\{days\}/g, String(ctx.days))
+    if (ctx.dayUnit !== undefined) text = text.replace(/\{dayUnit\}/g, String(ctx.dayUnit))
     if (ctx.hour !== undefined) text = text.replace(/\{hour\}/g, String(ctx.hour))
   }
   return {
@@ -213,6 +286,19 @@ function inLateNight(date, startHour, endHour) {
   return hour >= start || hour < end
 }
 
+function specialDayKind(date) {
+  var month = date.getMonth() + 1
+  var day = date.getDate()
+  if (month === 8 && day === 25) return "linuxAnnouncement"
+  if (month === 10 && day === 5) return "linuxRelease"
+  if (date.getDay() === 5 && date.getHours() >= FRIDAY_DEPLOY_HOUR) return "fridayDeploy"
+  return ""
+}
+
+function resumeGapMs() {
+  return RESUME_GAP_MS
+}
+
 if (typeof module !== "undefined") {
   module.exports = {
     bankFor: bankFor,
@@ -224,11 +310,16 @@ if (typeof module !== "undefined") {
     parseLoadavg: parseLoadavg,
     parseUptimeSeconds: parseUptimeSeconds,
     uptimeDays: uptimeDays,
+    dayUnit: dayUnit,
     nextMilestone: nextMilestone,
     wanderIntervalMs: wanderIntervalMs,
     nightKey: nightKey,
+    dayKey: dayKey,
     inLateNight: inLateNight,
+    specialDayKind: specialDayKind,
+    resumeGapMs: resumeGapMs,
     formatHour: formatHour,
-    UPTIME_MILESTONES: UPTIME_MILESTONES
+    UPTIME_MILESTONES: UPTIME_MILESTONES,
+    RESUME_GAP_MS: RESUME_GAP_MS
   }
 }

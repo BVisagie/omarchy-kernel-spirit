@@ -2,7 +2,7 @@
 
 A grouchy kernel-hacker penguin that lives in the Omarchy bar and comments, in character, on what the machine is doing.
 
-Left-click summons a line. He also wanders in on his own, and will pipe up when load stays high, the battery is leaving, the session runs late, uptime crosses a milestone, or you switch themes — he redraws himself in the new colors and has opinions about it. He blinks, his beak moves while he talks, and he hops when a line lands. Mute him from the bar without removing the plugin.
+Left-click summons a line. He also wanders in on his own, and will pipe up when load stays high, the battery is leaving, you plug back in after a scare, the session runs late, uptime crosses a milestone, you wake the machine from suspend, you switch themes, or the calendar hits a Linux anniversary — he redraws himself in the new colors and has opinions about it. He blinks, glances around, his beak moves while he talks, and he hops when a line lands. Mute him from the bar without removing the plugin.
 
 This is unofficial fan work. Not affiliated with or endorsed by Linus Torvalds, the Linux Foundation, or Omarchy. The character is a penguin spirit, not a likeness of a person. No photographs.
 
@@ -59,10 +59,12 @@ omarchy bar set io.github.bvisagie.kernel-spirit loadTrigger false
 | `autoHideMs` | `8000` | Speech bubble lifetime |
 | `snoozeMin` | `60` | Middle-click snooze length |
 | `loadTrigger` | `true` | Comment when load per core stays high |
-| `batteryTrigger` | `true` | Comment when discharging at or below the threshold |
+| `batteryTrigger` | `true` | Comment when discharging at or below the threshold, and when power is restored |
 | `lateNightTrigger` | `true` | Comment once per late-night session |
-| `uptimeTrigger` | `true` | Comment at 1 / 7 / 14 / 30 day uptime |
+| `uptimeTrigger` | `true` | Comment at 1 / 7 / 14 / 30 / 60 / 90 / 100 day uptime |
 | `themeTrigger` | `true` | Comment when the theme changes |
+| `resumeTrigger` | `true` | Comment after resume from suspend |
+| `specialDayTrigger` | `true` | Comment on Aug 25, Oct 5, and Friday after 16:00 |
 | `loadThreshold` | `0.75` | Load per core that counts as busy |
 | `batteryThreshold` | `20` | Battery percent that counts as low |
 | `lateNightStartHour` | `0` | Late-night window start (0–23) |

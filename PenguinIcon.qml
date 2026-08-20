@@ -2,10 +2,10 @@ import QtQuick
 import qs.Commons
 
 // Theme-colored pixel penguin, 16×16 cells scaled to the painted box.
-// Legend: K body, W belly/eye white, A glasses, O beak and feet, P pupil.
-// Frames: idle, blink (self-timed), talk (mouth flap while `talking`),
-// sleep (while `muted`). Colors follow the active theme, so he recolors
-// himself the moment the theme changes.
+// Legend: K body, W belly/eye white, A glasses, O beak and feet, P pupil,
+// Z sleep-z. Frames: idle, blink, glance, talk, sleep with rising Zs.
+// Colors follow the active theme, so he recolors himself the moment
+// the theme changes.
 Item {
   id: root
 
@@ -20,13 +20,26 @@ Item {
   property color glassColor: Color.accent
   property color beakColor: Color.urgent
   property color pupilColor: Color.foreground
+  property color zzzColor: Qt.rgba(
+    Color.foreground.r * 0.4 + Color.background.r * 0.6,
+    Color.foreground.g * 0.4 + Color.background.g * 0.6,
+    Color.foreground.b * 0.4 + Color.background.b * 0.6, 1)
 
   property bool blinking: false
   property bool mouthOpen: false
+  property int glance: 0
+  property int sleepPhase: 0
 
-  readonly property string frame: muted
-    ? "sleep"
-    : (talking && mouthOpen ? "talk" : (blinking ? "blink" : "idle"))
+  readonly property string frame: {
+    if (root.muted) return "sleep-" + root.sleepPhase
+    var parts = []
+    if (root.talking && root.mouthOpen) parts.push("talk")
+    else parts.push("idle")
+    if (root.blinking) parts.push("blink")
+    else if (root.glance < 0) parts.push("left")
+    else if (root.glance > 0) parts.push("right")
+    return parts.join("-")
+  }
 
   readonly property var idleRows: [
     "................",
@@ -47,15 +60,28 @@ Item {
     "................"
   ]
 
-  function rowsFor(name) {
+  function rowsFor() {
     var rows = idleRows.slice()
-    if (name === "blink") {
-      rows[5] = "..AAWWWAAWWWAA.."
-    } else if (name === "sleep") {
+    if (root.muted) {
       rows[4] = "...KKKKKKKKKK..."
       rows[5] = "..AAWWWAAWWWAA.."
       rows[6] = "...KKKKKKKKKK..."
-    } else if (name === "talk") {
+      if (root.sleepPhase === 0) {
+        rows[0] = "............Z..."
+      } else {
+        rows[0] = ".............Z.."
+        rows[1] = ".....KKKKKK.Z..."
+      }
+      return rows
+    }
+    if (root.blinking) {
+      rows[5] = "..AAWWWAAWWWAA.."
+    } else if (root.glance < 0) {
+      rows[5] = "..AAPWWAAPWWAA.."
+    } else if (root.glance > 0) {
+      rows[5] = "..AAWWPAAWWPAA.."
+    }
+    if (root.talking && root.mouthOpen) {
       rows[8] = "...KWWOOOOWWK..."
     }
     return rows
@@ -72,6 +98,7 @@ Item {
   onGlassColorChanged: canvas.requestPaint()
   onBeakColorChanged: canvas.requestPaint()
   onPupilColorChanged: canvas.requestPaint()
+  onZzzColorChanged: canvas.requestPaint()
   onWidthChanged: canvas.requestPaint()
   onHeightChanged: canvas.requestPaint()
   Component.onCompleted: canvas.requestPaint()
@@ -95,6 +122,36 @@ Item {
     onTriggered: root.blinking = false
   }
 
+  // Occasional glance left or right, independent of the blink.
+  Timer {
+    id: glanceTimer
+    running: root.visible && !root.muted
+    repeat: true
+    interval: 4500 + Math.round(Math.random() * 5500)
+    onTriggered: {
+      root.glance = Math.random() < 0.5 ? 0 : (Math.random() < 0.5 ? -1 : 1)
+      if (root.glance !== 0) glanceOffTimer.restart()
+      interval = 4500 + Math.round(Math.random() * 5500)
+    }
+    onRunningChanged: if (!running) root.glance = 0
+  }
+
+  Timer {
+    id: glanceOffTimer
+    interval: 380 + Math.round(Math.random() * 220)
+    onTriggered: root.glance = 0
+  }
+
+  // Rising Zs while muted or snoozed.
+  Timer {
+    id: sleepTimer
+    running: root.visible && root.muted
+    repeat: true
+    interval: 750
+    onTriggered: root.sleepPhase = root.sleepPhase === 0 ? 1 : 0
+    onRunningChanged: if (!running) root.sleepPhase = 0
+  }
+
   // Beak flap while a line is on screen.
   Timer {
     id: mouthTimer
@@ -113,7 +170,7 @@ Item {
     onPaint: {
       var ctx = getContext("2d")
       ctx.clearRect(0, 0, width, height)
-      var rows = root.rowsFor(root.frame)
+      var rows = root.rowsFor()
       var cols = 16
       var px = Math.max(1, Math.floor(Math.min(width / cols, height / rows.length)))
       var ox = Math.floor((width - px * cols) / 2)
@@ -123,7 +180,8 @@ Item {
         "W": root.cssColor(root.bellyColor),
         "A": root.cssColor(root.glassColor),
         "O": root.cssColor(root.beakColor),
-        "P": root.cssColor(root.pupilColor)
+        "P": root.cssColor(root.pupilColor),
+        "Z": root.cssColor(root.zzzColor)
       }
 
       for (var y = 0; y < rows.length; y++) {
